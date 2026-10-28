@@ -1,0 +1,11 @@
+# STG
+STG_CLIENT_ID=your-stg-client-id
+STG_CLIENT_SECRET=your-stg-client-secret
+STG_ENV_ID=your-stg-environment-id
+STG_WS_ID=your-stg-workspace-id
+
+# PROD
+PROD_CLIENT_ID=your-prod-client-id
+PROD_CLIENT_SECRET=your-prod-client-secret
+PROD_ENV_ID=your-prod-environment-id
+PROD_WS_ID=your-prod-workspace-id

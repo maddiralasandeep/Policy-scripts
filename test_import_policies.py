@@ -86,6 +86,9 @@ class PolicyDeltaTests(unittest.TestCase):
 
         run_migration(dry_run=True)
 
+        self.assertEqual(_get_token.call_count, 2)
+        self.assertEqual(_get_token.call_args_list[0].args[2], "STG")
+        self.assertEqual(_get_token.call_args_list[1].args[2], "PROD")
         self.assertEqual(get_all_policies.call_count, 2)
         self.assertEqual(get_all_policies.call_args_list[0].kwargs["environment_name"], "STG")
         self.assertEqual(get_all_policies.call_args_list[1].kwargs["environment_name"], "PROD")

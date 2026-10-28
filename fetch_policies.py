@@ -12,15 +12,17 @@ load_dotenv()
 BASE_URL = os.getenv("PLAINID_BASE_URL", "https://api.us1.plainid.io")
 STG_ENV_ID = os.getenv("STG_ENV_ID", "YOUR_STG_ENV_ID")
 STG_WS_ID = os.getenv("STG_WS_ID", "YOUR_STG_WORKSPACE_ID")
+STG_CLIENT_ID = os.getenv("STG_CLIENT_ID")
+STG_CLIENT_SECRET = os.getenv("STG_CLIENT_SECRET")
 
 
-def get_token(client_id=None, client_secret=None):
+def get_token(client_id, client_secret, environment_name):
     """Return a PlainID bearer token using client credentials."""
-    client_id = client_id or os.getenv("CLIENT_ID")
-    client_secret = client_secret or os.getenv("CLIENT_SECRET")
-
     if not client_id or not client_secret:
-        raise ValueError("PlainID CLIENT_ID and CLIENT_SECRET are required.")
+        raise ValueError(
+            f"{environment_name}_CLIENT_ID and {environment_name}_CLIENT_SECRET "
+            "are required."
+        )
 
     url = f"{BASE_URL}/api/1.0/api-key/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -57,7 +59,7 @@ def get_all_policies(
     if not workspace_id or workspace_id.startswith("YOUR_"):
         raise ValueError(f"A valid {environment_name} workspace ID is required.")
 
-    token = token or get_token()
+    token = token or get_token(STG_CLIENT_ID, STG_CLIENT_SECRET, "STG")
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",

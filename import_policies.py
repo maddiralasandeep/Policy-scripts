@@ -7,13 +7,23 @@ from datetime import datetime, timezone
 import requests
 from dotenv import load_dotenv
 
-from fetch_policies import BASE_URL, STG_ENV_ID, STG_WS_ID, get_all_policies, get_token
+from fetch_policies import (
+    BASE_URL,
+    STG_CLIENT_ID,
+    STG_CLIENT_SECRET,
+    STG_ENV_ID,
+    STG_WS_ID,
+    get_all_policies,
+    get_token,
+)
 
 
 load_dotenv()
 
 PROD_ENV_ID = os.getenv("PROD_ENV_ID", "YOUR_PROD_ENV_ID")
 PROD_WS_ID = os.getenv("PROD_WS_ID", "YOUR_PROD_WORKSPACE_ID")
+PROD_CLIENT_ID = os.getenv("PROD_CLIENT_ID")
+PROD_CLIENT_SECRET = os.getenv("PROD_CLIENT_SECRET")
 DELTA_REPORT_FILE = os.getenv("DELTA_REPORT_FILE", "policy_delta_report.json")
 STATE_FILE = os.getenv("STATE_FILE", "successful_imports.txt")
 
@@ -152,8 +162,12 @@ def validate_configuration():
     configuration = {
         "STG_ENV_ID": STG_ENV_ID,
         "STG_WS_ID": STG_WS_ID,
+        "STG_CLIENT_ID": STG_CLIENT_ID,
+        "STG_CLIENT_SECRET": STG_CLIENT_SECRET,
         "PROD_ENV_ID": PROD_ENV_ID,
         "PROD_WS_ID": PROD_WS_ID,
+        "PROD_CLIENT_ID": PROD_CLIENT_ID,
+        "PROD_CLIENT_SECRET": PROD_CLIENT_SECRET,
     }
     missing = [
         key
@@ -169,14 +183,11 @@ def validate_configuration():
 def run_migration(dry_run=False):
     validate_configuration()
 
-    stg_token = get_token()
-    prod_token = os.getenv("PROD_TOKEN")
-    if not prod_token:
-        prod_client_id = os.getenv("PROD_CLIENT_ID") or os.getenv("CLIENT_ID")
-        prod_client_secret = os.getenv("PROD_CLIENT_SECRET") or os.getenv(
-            "CLIENT_SECRET"
-        )
-        prod_token = get_token(prod_client_id, prod_client_secret)
+    print("Generating token with STG credentials...")
+    stg_token = get_token(STG_CLIENT_ID, STG_CLIENT_SECRET, "STG")
+
+    print("Generating token with PROD credentials...")
+    prod_token = get_token(PROD_CLIENT_ID, PROD_CLIENT_SECRET, "PROD")
 
     print("Fetching active policies from STG...")
     source_policies = get_all_policies(
